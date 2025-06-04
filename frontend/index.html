@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>K-CVAT JSON Uploader</title>
+</head>
+<body>
+  <h1>Upload JSON Annotation</h1>
+  <form id="uploadForm">
+    <input type="file" name="file" accept=".json" required />
+    <button type="submit">Upload</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("uploadForm").onsubmit = async function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch("/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      const resultDiv = document.getElementById("result");
+
+      if (res.ok) {
+        resultDiv.innerHTML = `
+          <a href="${data.download_url}">Download CSV</a>
+          <pre>${JSON.stringify(data.analysis, null, 2)}</pre>
+        `;
+      } else {
+        resultDiv.textContent = data.error || "An error occurred";
+      }
+    };
+  </script>
+</body>
+</html>
